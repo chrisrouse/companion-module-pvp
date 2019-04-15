@@ -712,8 +712,146 @@ instance.prototype.actions = function(system) {
 					default: ''
 				}
 			]
-		}
+		},
 
+		'workspaceTransition': {
+			label: 'Workspace Transition',
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Transition',
+					id: 'transition',
+					default: 'Dissolve',
+					choices: [
+						{ id:'Amoeba', label:'Amoeba (Scale, Duration)' },
+						{ id:'Color Burn', label:'Color Burn (Burn Color , Duration)' },
+						{ id:'Color Push', label:'Color Push (Duration)' },
+						{ id:'Color Warp', label:'Color Warp (Zoom, Size, Color Separation, Duration)' },
+						{ id:'Cross Hatch', label:'Cross Hatch (Duration)' },
+						{ id:'Cube', label:'Cube (Duration)' },
+						{ id:'Cut', label:'Cut (No options)' },
+						{ id:'Dispersion Blur', label:'Dispersion Blur (Radius, Angle, Duration)' },
+						{ id:'Dissolve', label:'Dissolve (Duration)' },
+						{ id:'Door', label:'Door (Duration)' },
+						{ id:'Fade', label:'Fade (Duration)' },
+						{ id:'Fade Black', label:'Fade Black (Duration)' },
+						{ id:'Fade Bright', label:'Fade Bright (Duration)' },
+						{ id:'Fade Dark', label:'Fade Dark (Duration)' },
+						{ id:'Fade Gray', label:'Fade Gray (Duration)' },
+						{ id:'Fade White', label:'Fade White (Duration)' },
+						{ id:'Film Burn', label:'Film Burn (Duration)' },
+						{ id:'Flip', label:'Flip (Duration)' },
+						{ id:'Fly In', label:'Fly In (Direction [Any], Duration)' },
+						{ id:'Iris', label:'Iris (Duration)' },
+						{ id:'Kaleidoscope Wipe', label:'Kaleidoscope Wipe (Duration)' },
+						{ id:'Mosaic', label:'Mosaic (Duration)' },
+						{ id:'Move In', label:'Move In (Direction [Except Center], Duration)' },
+						{ id:'Noisy Zoom', label:'Noisy Zoom (Duration)' },
+						{ id:'Push', label:'Push (Direction [Top, Left, Right, Bottom only], Duration' },
+						{ id:'Random Pixels', label:'Random Pixels (Duration)' },
+						{ id:'Random Squares', label:'Random Squares (Random Squares Size, Duration)' },
+						{ id:'Random Squares Flicker', label:'Random Squares Flicker (Duration)' },
+						{ id:'Reveal', label:'Reveal (Direction [Except Center], Duration)' },
+						{ id:'Ripple', label:'Ripple (Duration)' },
+						{ id:'Square Wipe', label:'Square Wipe (Direction [Except Center], Duration)' },
+						{ id:'Swap', label:'Swap (Duration)' },
+						{ id:'Warp Fade', label:'Warp Fade (Duration)' },
+						{ id:'Wave Dissolve', label:'Wave Dissolve (Duration)' },
+						{ id:'Wipe', label:'Wipe (Direction [Except Center], Duration)' },
+						{ id:'Zoom In', label:'Zoom In (Direction [Any], Duration)' },
+					]
+				},
+				{
+					type: 'textinput',
+					label: 'Duration (0.0 to 5.0)',
+					id: 'duration',
+					default: '0.5',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+				
+				{
+					type: 'textinput',
+					label: 'Scale(10.0 to 40.0)',
+					id: 'scale',
+					default: '10',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+				
+				{
+					type: 'textinput',
+					label: 'Burn Color (Hex)',
+					id: 'burnColor',
+					default: '#F0F0F0'					
+				},
+				
+				{
+					type: 'textinput',
+					label: 'Zoom (10.0 to 40.0)',
+					id: 'zoom',
+					default: '20.0',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+				
+				{
+					type: 'textinput',
+					label: 'Size (0.01 to 1.1)',
+					id: 'size',
+					default: '0.05',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+				
+				{
+					type: 'textinput',
+					label: 'Random Squares Size (1.0 to 10.0)',
+					id: 'randomSquaresSize',
+					default: '2.5',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+
+								
+				{
+					type: 'textinput',
+					label: 'Color Separation (0.1 to 4.1)',
+					id: 'colorSeparation',
+					default: '0.85',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+								
+				{
+					type: 'textinput',
+					label: 'Radius (0.0 to 2.0)',
+					id: 'radius',
+					default: '0.5',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+								
+				{
+					type: 'textinput',
+					label: 'Angle (0.0 to 4.0)',
+					id: 'angle',
+					default: '2.3',
+					regex: self.REGEX_FLOAT_OR_INT
+				},
+				
+				{
+					type: 'dropdown',
+					label: 'Direction (Not all directions supported by each transition)',
+					id: 'genericDirection',
+					default: '1',
+					choices: [
+						{ id:'1', label:'Top Left' },
+						{ id:'2', label:'Top' },
+						{ id:'4', label:'Top Right' },
+						{ id:'8', label:'Left' },
+						{ id:'16', label:'Center' },
+						{ id:'32', label:'Right' },
+						{ id:'64', label:'Bottom Left' },
+						{ id:'128', label:'Bottom' },
+						{ id:'256', label:'Bottom Right' }
+					]
+				}	
+			]
+		}
 	});
 };
 
@@ -952,8 +1090,110 @@ instance.prototype.action = function(action) {
 			self.doCommand('/blendMode/layer/' + opt.idx, { value: opt.blendMode });
 			return;
 
-	}
+		case 'workspaceTransition':
+			self.doCommand('/transition/workspace', {
+				"transition" : {
+					"variables" : [
+							{
+							"type" : "Float",
+								"base" : {
+									"value" : parseFloat(opt.scale),
+									"name" : "Scale"
+								}
+							},
+							{
+							"type" : "Color",
+								"base" : {
+									"name" : "Burn Color",
+									"color" : opt.burnColor
+								}
+							},
 
+
+							{
+							"type" : "Float",
+								"base" : {
+									"value" : parseFloat(opt.zoom),
+									"name" : "Zoom"
+								}
+							},
+
+							{
+							"type" : "Float",
+								"base" : {
+									"value" : parseFloat(opt.size),
+									"name" : "Size"
+								}
+							},
+
+							{
+							"type" : "Float",
+								"base" : {
+									"value" : parseFloat(opt.colorSeparation),
+									"name" : "Color Separation"
+								}
+							},
+
+							{
+							"type" : "Float",
+								"base" : {
+									"value" : parseFloat(opt.radius),
+									"name" : "Radius"
+								}
+							},
+
+							{
+							"type" : "Float",
+								"base" : {
+									"value" : parseFloat(opt.angle),
+									"name" : "Angle"
+								}
+							},
+							
+/*
+							{
+							"type" : "Direction",
+								"base" : {
+									"name" : "Direction",
+									"direction": parseInt(opt.flyInDirection)
+								}
+							},
+*/
+							
+							{
+							"type" : "Direction",
+								"base" : {
+									"name" : "Direction",
+									"direction": parseInt(opt.genericDirection)
+								}
+							},
+							
+/*
+							{
+							"type" : "Direction",
+								"base" : {
+									"name" : "Direction",
+									"direction": parseInt(opt.pushDirection)
+								}
+							},
+*/
+
+							{
+							"type" : "Float",
+								"base" : {
+									"value" : parseFloat(opt.randomSquaresSize),
+									"name" : "Size"
+								}
+							}
+						
+					],
+					"duration" : parseFloat(opt.duration),
+					"enabled": true,
+					"name" : opt.transition
+				}
+			});
+			return;
+	}
 };
 
 
@@ -995,6 +1235,8 @@ instance.prototype.formatOpacity = function(opacity) {
 	return Math.round(opacity) / 100.0;
 
 };
+
+
 
 
 /**
